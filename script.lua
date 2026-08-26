@@ -1,4 +1,4 @@
-if ZR_LOADED and not _G.IY_DEBUG then
+if IY_LOADED and not _G.IY_DEBUG then
 	return
 end
 
