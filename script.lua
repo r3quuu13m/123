@@ -157,3 +157,31 @@ until workspace.CurrentCamera
 
 workspace.CurrentCamera.FieldOfView = 120
 
+PlayerFlying = false
+
+UIS.InputBegan:Connect(function(input)
+	if input.KeyCode == Enum.KeyCode.V then -- Клавиша V для включения/выключения полета
+		PlayerFlying = not PlayerFlying
+		
+		if PlayerFlying then
+			game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50 -- Анимация прыжка при падении
+			warn("Полет активирован!")
+		else
+			game.Players.LocalPlayer.Character.Humanoid.JumpPower = -25 -- Сброс анимации полета
+			warn("Полет выключен.")
+		end
+			
+	end
+	
+	if input.KeyCode == Enum.KeyCode.W then
+		game.Players.LocalPlayer.Character.Humanoid:ChangeDirection(0, 16)
+		
+	elseif input.KeyCode == Enum.KeyCode.A then
+		
+	elseif input.KeyCode == Enum.KeyCode.S then
+		
+	elseif input.KeyCode == Enum.KeyCode.D then
+		
+	end
+	
+end)
