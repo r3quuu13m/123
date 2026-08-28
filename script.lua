@@ -160,7 +160,15 @@ workspace.CurrentCamera.FieldOfView = 120
 local UIS = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 
+local UIS = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+
 PlayerFlying = false
+
+-- Функция для проверки наличия Humanoid в персонаже
+function checkHumanoid(obj)
+    return obj and (obj:IsA('Model') or obj:IsA('BasePart')) and findmetatable('Character'):FindFirstChild(obj)
+end
 
 UIS.InputBegan:Connect(function(input)
 	if input.KeyCode == Enum.KeyCode.V then -- Клавиша V для включения/выключения полета
@@ -189,29 +197,35 @@ UIS.InputBegan:Connect(function(input)
 	
 end)
 
--- Обход проверок на полет с использованием скрытых свойств
-gethiddenproperty(game.Players.LocalPlayer.Character.Humanoid, "JumpPower") -- Блокировка JumpPower
-
--- Включение плавного перемещения при полете
-game:GetService("RunService").Render stepped:connect(function(delta)
-	if PlayerFlying then
-		local velocity = Instance.new("Vector3")
-		
-		velocity.Y += (1 * delta)  -- Горизонтальное движение вверх
-		
-		game.Players.LocalPlayer.Character.Humanoid.MoveDirection = velocity
-	end
-	
-end)
-
--- Дополнительный обход: изменение CameraType для более комфортного полета
-workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
-
 -- Обход проверок на перемещение
-hookmetamethod("table", "__call", function(t, ...)
-	if t == "Workspace" then
-		return 
+if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then
+    local humanoid = game.Players.LocalPlayer.Character.Humanoid
+    
+    -- Используем скрытые свойства для управления полетом
+    gethiddenproperty(humanoid, "CanFly")
+    
+    -- Включение плавного перемещения при полете
+    humanoid.MoveDirection = nil
+end
+
+-- Дополнительные инструменты для полета
+local function flyMovement(delta)
+	if PlayerFlying then
+		local userInput = getinput()
+		
+		-- Обновление вектора движения в зависимости от нажатых клавиш
+		local velocity = Instance.new('Vector3')
+		
+		if userInput.KeyCode == Enum.KeyCode.W then
+			velocity.Y += delta * 10 -- Движение вперед (вверх по Y)
+		elseif userInput.KeyCode == Enum KeyCode.S then
+			velocity.Y -= delta * 10 -- Движение назад (вниз по Y)
+		end
+		
+		-- Применение движения к Humanoid
+		humanoid.MoveDirection = velocity
 	end
 	
-end)
+end
 
+game:GetService('RunService').Render:waitForHeartbeat(0.5):connect(flyMovement)
