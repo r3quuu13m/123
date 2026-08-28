@@ -157,7 +157,6 @@ until workspace.CurrentCamera
 
 workspace.CurrentCamera.FieldOfView = 120
 
-local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
 
 -- Элемент интерфейса для отображения FOV
