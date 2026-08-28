@@ -157,30 +157,4 @@ until workspace.CurrentCamera
 
 workspace.CurrentCamera.FieldOfView = 120
 -- FLY
-lua
-local Players = game:GetService("Players")
-local UIS = game:GetService("UserInputService")
 
-local PlayerFlying = false
-
-UIS.InputBegan:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.V then -- Клавиша V для включения/выключения полета
-        PlayerFlying = not PlayerFlying
-        
-        while PlayerFlying do task.wait()
-            local humanoid = Players.LocalPlayer.Character.Humanoid
-            
-            for _, key in ipairs({Enum.KeyCode.W, Enum KeyCode.A}) do
-                if input.KeyCode == key then
-                    -- Прямое изменение движения
-                    humanoid.BodyVelocity = Instance.new("BodyVelocity")
-                    humanoid.BodyVelocity.PistonCFrame = humanoid.RootPart.CFrame * CFrame.new(
-                        (key == Enum.KeyCode.D and 1) or -1,
-                        PlayerFlying and (input.KeyCode == Enum.KeyCode.W or input.KeyCode == Enum KeyCode.S)*delta*2,
-                        key == Enum.KeyCode.A and delta
-                    )
-                end
-            end
-        end
-    end
-end)
