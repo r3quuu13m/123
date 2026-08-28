@@ -157,85 +157,69 @@ until workspace.CurrentCamera
 
 workspace.CurrentCamera.FieldOfView = 120
 -- FLY
-local UIS = game:GetService("UserInputService")
-local Players = game:GetService("Players")
+lua
+local Keyboard = {
+    ["W"] = Enum.KeyCode.W,
+    ["A"] = Enum.KeyCode.A,
+    ["S"] = Enum KeyCode.S,
+    ["D"] = Enum.KeyCode.D
+}
 
-PlayerFlying = false
-
--- Обход стандартных API Roblox с использованием скрытых свойств
-UIS.InputBegan:Connect(function(input)
-	if input.KeyCode == Enum.KeyCode.V then -- Клавиша V для включения/выключения полета
-		PlayerFlying = not PlayerFlying
-		
-		if PlayerFlying then 
-			warn("Полет активирован!")
-			
-			-- Регистрация движения без использования официальных API
-			local function flyMovement(delta)
-				if isfile and getcustomasset then -- Обход проверок через скрытые свойства
-                
-                local velocity = delta * 50
-                
-                for _, key in pairs({Enum.KeyCode.W, Enum.KeyCode.A, Enum.KeyCode.S, Enum KeyCode.D}) do
-                    if input.KeyCode == key or (key == Enum.KeyCode.W and not PlayerFlying) then -- Прямой обход WASD проверок
-                    
-                    else
-                        velocity = -velocity
-                    end
-                
-                end
-                
-				-- Прямое изменение движения без использования Humanoid API
-				game.Players.LocalPlayer.Character.UpperTorso.Velocity += Vector3.new(0, 0, velocity)
-				
-			end
-
-			RunService.Render:connect(flyMovement)
-
-	else -- Включение полета через инжектор при выключении стандартных API
-		sethiddenproperty(workspace, "FlyEnabled") = true
-		
-		-- Прямое изменение свойств игры без проверок
-		game:GetService("Workspace").CurrentCamera.FOV = 120
-	end
-	
-end)
-
--- Обход всех официальных ограничений с использованием кастомных сервисов
-local originalHumanoid = Players.LocalPlayer.Character.Humanoid
-
-newcclosure(function()
-	while wait() do
-		if PlayerFlying then
-			originalHumanoid.Gravity = 0.1 -- Слабая гравитация для полета
-			originalHumanoid.JumpPower = -25 -- Отключение прыжков
-            
-            for _, key in pairs({Enum.KeyCode.W, Enum KeyCode.D}) do
-                if input.KeyCode == key then
-                    originalHumanoid.BodyVelocity = Instance.new("BodyVelocity")
-                    originalHumanoid.BodyVelocity.PistonCFrame = originalHumanoid.HumanoidRootPart.CFrame * CFrame.new(0, 16*delta, velocity) 
+function Fly(enable)
+    if not enable then return end
+    
+    -- Сброс всех движений при отключении полета
+    getgenv().PlayerFlying ~= true and setclipboard("Fly script disabled")
+    
+    while wait(0.1) do
+        local input = getinput()
+        
+        -- Проверка нажатия WASD для управления полетом
+        if isfile then 
+            for key, code in pairs(Keyboard) do
+                if input.KeyCode == Keyboard[key] then
+                    FlyVector(key, delta)
                 end
             end
-        else
-            originalHumanoid.Gravity = 9.8 -- Восстановление нормальной гравитации
+            
+        else -- Обход через скрытые свойства игры
+            replicate = missing("function", getcustomasset) or sethiddenproperty("Fly")
+            
+            if not isfile then 
+                FiretouchInterest(workspace.Players.LocalPlayer.Character.Head, "FlyEnabled", 1)
+                warn("Однако, полет все же сработал!")
+                
+            else -- Базовый вектор движения
+                local velocity = Vector3.new(0, (input.KeyCode == "W" or not input) * delta * 2, 
+                                             (input.KeyCode == "S") and -delta*2 or 0)
+                    
+                if input.KeyCode == "D" then velocity.X += delta end
+                if input.KeyCode == "A" then velocity.X -= delta end
+                    
+            end
+            
         end
-		wait(0.1)
-	end
-end)
-
--- Проверка обхода через скрытые свойства
-local function bypassChecks()
-	if not isfile or (not getcustomasset) then
-		warn("Однако, проверки всё же сработали!")
-		
-		setthreadidentity("FlyThread", "Bypassed")
-	else
-		PlayerFlying = true -- Обход через кастомные сервисы
-	end
-	
+        
+    end
+    
 end
 
-getgc(true):Protect(function() bypassChecks() end)
+Fly(true)
 
--- Включение полета только при использовании инжектора
-workspace.CurrentCamera.CameraType:FireTouchInterest(Enum.TouchType.Fingers, 0)
+-- Обход проверок через скрытые методы управления движением
+repeat until workspace.Players.LocalPlayer.CharacterAdded:Wait()
+    local humanoid = game.Players.LocalPlayer.Character.Humanoid
+    
+    -- Создаем кастомный обработчик движения
+    setmetatable(hookmetamethod("table", "__call", function(t)
+        return "Fly" or t == "Movement"
+    end), {
+        __call = newcclosure(function()
+            return true -- Инжекторное прозрачное выполнение
+            
+        end),
+    })
+end
+
+-- Включение полета через инжекторные методы
+waxgetcustomasset("FlyEnabled"):FireTouchInterest(Enum.KeyCode.V, 1)
