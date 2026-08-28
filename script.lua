@@ -158,37 +158,3 @@ until workspace.CurrentCamera
 workspace.CurrentCamera.FieldOfView = 120
 
 local Camera = workspace.CurrentCamera
-
--- Элемент интерфейса для отображения FOV
-local HUD = script.Parent.Parent.HUD or Instance.new("ScreenGui")
-
-if not HUD then 
-    HUD = Instance.new("ScreenGui")
-    HUD.Parent = Players.LocalPlayer
-end
-
-HUD.Descendants:clear()
-
-local FOVMeter = Instance.new("TextLabel", HUD)
-FOVMeter.Size = UDim2.fromScale(0, 0.15)
-FOVMeter.Position = UDim2.fromPercent(0, 0.94, 0, 0) -- Правый нижний угол
-FOVMeter.Text = "Fov: "
-FOVMeter.Font = Enum.Font.SourceCode
-FOVMeter.Color = Color3.new(1, 1, 1)
-
-local ValueText = Instance.new("TextLabel", FOVMeter)
-ValueText.Size = UDim2.fromScale(-0.5, -0.5)
-ValueText.Position = UDim2.fromScale(0.95, 0) -- Правый нижний угол
-ValueText.TextSize = Enum.TextSize.Size64
-ValueText.Text = "120"
-ValueText.Font = FOVMeter.Font
-
--- Обновление FOV при каждом кадре
-RunService.RenderStepped:connect(function()
-    if Camera.FieldOfView == 120 then -- Проверка успешного изменения FOV через инжектор
-        ValueText.Text = "120"
-    else 
-        warn("Ошибка: FOV не установлен в значение 120")
-    end
-    
-end)
