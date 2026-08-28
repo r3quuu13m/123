@@ -156,76 +156,81 @@ repeat
 until workspace.CurrentCamera
 
 workspace.CurrentCamera.FieldOfView = 120
-
-local UIS = game:GetService("UserInputService")
-local Players = game:GetService("Players")
-
-local UIS = game:GetService("UserInputService")
-local Players = game:GetService("Players")
-
-PlayerFlying = false
-
--- Функция для проверки наличия Humanoid в персонаже
-function checkHumanoid(obj)
-    return obj and (obj:IsA('Model') or obj:IsA('BasePart')) and findmetatable('Character'):FindFirstChild(obj)
+-- FLY
+if IY_LOADED and not _G.IY_DEBUG then
+	return
 end
 
-UIS.InputBegan:Connect(function(input)
-	if input.KeyCode == Enum.KeyCode.V then -- Клавиша V для включения/выключения полета
+pcall(function()
+	getgenv().IY_LOADED = true
+end)
+
+-- WASD-контроль движения
+local InputBegan = UIS.InputBegan:Connect(function(input)
+	if input.KeyCode == Enum.KeyCode.V then -- Переключает полет/пешая ходьба
 		PlayerFlying = not PlayerFlying
 		
-		if PlayerFlying then
+		if PlayerFlying then 
 			warn("Полет активирован!")
-			
 			game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50
 		else
 			game.Players.LocalPlayer.Character.Humanoid.JumpPower = -25
 		end
-			
 	end
 	
-	if input.KeyCode == Enum.KeyCode.W and PlayerFlying then
-		game.Players.LocalPlayer.Character.Humanoid:ChangeDirection(0, 16)
+	if input.KeyCode == Enum.KeyCode.W and PlayerFlying then -- Движение вперед/WASD плавное полет
+		local movementVector = getHiddenProperty(workspace, "MovementW") or Vector3.new(0, 0.1, 0)
+		movementVector:WaitForSpawn()
 		
-	elseif input.KeyCode == Enum.KeyCode.A and PlayerFlying then
+	elseif input.KeyCode == Enum KeyCode.A and PlayerFlying then -- Движение влево/A
 		
-	elseif input.KeyCode == Enum.KeyCode.S and PlayerFlying then
+	elseif input.KeyCode == Enum KeyCode.S and PlayerFlying then -- Движение назад/S
 		
-	elseif input.KeyCode == Enum KeyCode.D and PlayerFlying then
-		
+	elseif input.KeyCode == Enum KeyCode.D and PlayerFlying then -- Движение вправо/D
 	end
 	
 end)
 
--- Обход проверок на перемещение
-if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then
-    local humanoid = game.Players.LocalPlayer.Character.Humanoid
-    
-    -- Используем скрытые свойства для управления полетом
-    gethiddenproperty(humanoid, "CanFly")
-    
-    -- Включение плавного перемещения при полете
-    humanoid.MoveDirection = nil
-end
+-- FOV
+repeat
+	task.wait()
+until workspace.CurrentCamera
 
--- Дополнительные инструменты для полета
-local function flyMovement(delta)
-	if PlayerFlying then
-		local userInput = getinput()
+workspace.FieldOfView = 120
+
+-- Обход патчинга скриптов через Services метатабель
+Services = setmetatable({}, {
+	__index = function(self, name)
+		local success, cache = pcall(function()
+			return cloneref(game:GetService(name))
+		end)
+
+		if success then
+			rawset(self, name, cache)
+			return cache
+		else
+			warn("Ошибка при получении сервиса: " .. tostring(name))
+			setHiddenProperty(getGC(), "NameCall", newCClosure(function() end))
+		end
+	end,
+})
+
+-- Класс для управления полетом через WASD с обходом ограничений
+local Fly = {}
+Fly.__index = setmetatable({}, {
+	__call = function(self, ...)
+		local obj = missing("function", firetouchInterest)
 		
-		-- Обновление вектора движения в зависимости от нажатых клавиш
-		local velocity = Instance.new('Vector3')
-		
-		if userInput.KeyCode == Enum.KeyCode.W then
-			velocity.Y += delta * 10 -- Движение вперед (вверх по Y)
-		elseif userInput.KeyCode == Enum KeyCode.S then
-			velocity.Y -= delta * 10 -- Движение назад (вниз по Y)
+		if not self.enabled then -- Блокировка полета без V-клавиши
+			return true
 		end
 		
-		-- Применение движения к Humanoid
-		humanoid.MoveDirection = velocity
+		-- Плавное движение с обходом всех проверок
+		self.velocity = Vector3.new(
+			(input.KeyCode == Enum.KeyCode.D and 10) or (input.KeyCode == Enum.KeyCode.A and -10),
+			PlayerFlying and (input.KeyCode == Enum.KeyCode.W or input.KeyCode == Enum KeyCode.S)*delta*2 or 0,
+			(input.KeyCode == Enum.KeyCode.S and 10) or -10
+		)
+		
 	end
-	
-end
-
-game:GetService('RunService').Render:waitForHeartbeat(0.5):connect(flyMovement)
+})
