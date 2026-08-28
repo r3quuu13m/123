@@ -157,6 +157,9 @@ until workspace.CurrentCamera
 
 workspace.CurrentCamera.FieldOfView = 120
 
+local UIS = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+
 PlayerFlying = false
 
 UIS.InputBegan:Connect(function(input)
@@ -164,24 +167,51 @@ UIS.InputBegan:Connect(function(input)
 		PlayerFlying = not PlayerFlying
 		
 		if PlayerFlying then
-			game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50 -- Анимация прыжка при падении
 			warn("Полет активирован!")
+			
+			game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50
 		else
-			game.Players.LocalPlayer.Character.Humanoid.JumpPower = -25 -- Сброс анимации полета
-			warn("Полет выключен.")
+			game.Players.LocalPlayer.Character.Humanoid.JumpPower = -25
 		end
 			
 	end
 	
-	if input.KeyCode == Enum.KeyCode.W then
+	if input.KeyCode == Enum.KeyCode.W and PlayerFlying then
 		game.Players.LocalPlayer.Character.Humanoid:ChangeDirection(0, 16)
 		
-	elseif input.KeyCode == Enum.KeyCode.A then
+	elseif input.KeyCode == Enum.KeyCode.A and PlayerFlying then
 		
-	elseif input.KeyCode == Enum.KeyCode.S then
+	elseif input.KeyCode == Enum.KeyCode.S and PlayerFlying then
 		
-	elseif input.KeyCode == Enum.KeyCode.D then
+	elseif input.KeyCode == Enum KeyCode.D and PlayerFlying then
 		
 	end
 	
 end)
+
+-- Обход проверок на полет с использованием скрытых свойств
+gethiddenproperty(game.Players.LocalPlayer.Character.Humanoid, "JumpPower") -- Блокировка JumpPower
+
+-- Включение плавного перемещения при полете
+game:GetService("RunService").Render stepped:connect(function(delta)
+	if PlayerFlying then
+		local velocity = Instance.new("Vector3")
+		
+		velocity.Y += (1 * delta)  -- Горизонтальное движение вверх
+		
+		game.Players.LocalPlayer.Character.Humanoid.MoveDirection = velocity
+	end
+	
+end)
+
+-- Дополнительный обход: изменение CameraType для более комфортного полета
+workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
+
+-- Обход проверок на перемещение
+hookmetamethod("table", "__call", function(t, ...)
+	if t == "Workspace" then
+		return 
+	end
+	
+end)
+
