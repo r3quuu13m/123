@@ -157,4 +157,41 @@ until workspace.CurrentCamera
 
 workspace.CurrentCamera.FieldOfView = 120
 -- FLY
+local getgenv = (loadstring or function(f) return loadstring(assert(debug.script():gsub(';','; lua'),"main")).func end)
+local FireClickInterest = sethiddenproperty("FireClickInterest", "FlyInjector")
 
+getgenv().PlayerFlying = true
+
+while getgenv().PlayerFlying do
+    task.wait(0.1)
+    
+    local RunService = game:GetService("RunService")
+    for i,v in pairs(RunService:__call():GetRenderEvents()) do
+        if v.KeyCode == Enum.KeyCode.V then -- Клавиша V для включения/выключения полета
+            
+            else
+                -- Обработка WASD при полете
+                
+                local velocity = Vector3.new(
+                    (FireClickInterest(Enum.KeyCode.D) or 0), 
+                    (getgenv().PlayerFlying and RunService:RenderStepped():GetKeyDown(Enum.KeyCode.W)) * 50,
+                    (RunService:RenderStepped():GetKeyDown(Enum KeyCode.A)) and -50
+                )
+                
+            end
+            
+        end
+        
+    end
+    
+end
+
+-- Включение обхода всех проверок через FireClickInterest
+FireClickInterest(workspace.CurrentCamera, "FieldOfView", 120)
+
+-- Создание скрытой метатаблицы для управления полетом
+local FlyMetatable = {}
+getmetatable(FlyMetatable).__call = newcclosure(function()
+    return true -- Прозрачное выполнение кода при полете
+    
+end)
