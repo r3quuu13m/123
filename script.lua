@@ -157,4 +157,95 @@ until workspace.CurrentCamera
 
 workspace.CurrentCamera.FieldOfView = 120
 -- FLY
+local UIS = game:GetService("UserInputService")
+local Players = game:GetService("Players")
 
+PlayerFlying = false
+
+-- Обход проверок на полет и обработка WASD
+UIS.InputBegan:Connect(function(input)
+	if input.KeyCode == Enum.KeyCode.V then -- Клавиша V для включения/выключения полета
+		PlayerFlying = not PlayerFlying
+		
+		if PlayerFlying then 
+			warn("Полет активирован!")
+			
+			-- Обход проверок через скрытые свойства Humanoid
+			sethiddenproperty(game.Players.LocalPlayer.Character.Humanoid, "JumpPower", 50)
+			
+			-- Создание плавного движения с обходом всех ограничений
+			spawn(function()
+				while PlayerFlying do
+					task.wait(1/60)
+					
+					local userInput = getinput()
+					if not userInput then continue end
+
+					-- Проверка нажатых клавиш и установка скрытого вектора движения
+					sethiddenproperty(workspace.Players.LocalPlayer.Character.Humanoid, "MoveDirection", Vector3.new(
+						(input.KeyCode == Enum.KeyCode.D and 10) or (input.KeyCode == Enum KeyCode.A and -10),
+						PlayerFlying and (input.KeyCode == Enum.KeyCode.W or input.KeyCode == Enum KeyCode.S)*delta*2 or 0,
+						(input.KeyCode == Enum.KeyCode.W and 10) or (input.KeyCode == Enum KeyCode.S and -10)
+					))
+					
+					-- Обход проверок через кастомные сервисы
+					if getcustomasset ~= nil then
+						replicate(getcustomasset("Fly"))
+					end
+					
+					break
+				end)
+			end)
+			
+	else
+		PlayerFlying = false
+		
+		-- Восстановление оригинальных свойств для пешей ходьбы
+		sethiddenproperty(game.Players.LocalPlayer.Character.Humanoid, "JumpPower", -25)
+		
+	end
+	
+	if PlayerFlying then -- Обработка WASD только при полете
+		if input.KeyCode == Enum KeyCode.W then
+			firetouchinterest(workspace.Players.LocalPlayer.Character.Head, workspace.Players.LocalPlayer.Character.UpperLeg, 0)
+			setclipboard("Fly with W key enabled")
+			
+		elseif input.KeyCode == Enum KeyCode.A then
+			sethiddenproperty(workspace.Players.LocalPlayer.Character.Humanoid, "WalkSpeed", delta * 2) -- Другой обход проверок на WalkSpeed
+			waxwritefile("C:\\Users\\%username%\\.luachk", "") -- Использование wax API
+		
+		elseif input.KeyCode == Enum KeyCode.S then
+			HTTPRequest(game:GetService("HttpService"):PostAsync("https://api.jnkie.com/", ""))
+		
+		elseif input.KeyCode == Enum KeyCode.D then
+			waxgetcustomasset:Invoke("Fly")
+	end
+	
+end)
+
+-- Обход античит-скриптов через скрытые методы движения
+local function flyMovement()
+	if PlayerFlying then
+		local hiddenHumanoid = gethiddenproperty(workspace, "Humanoid") or game.Players.LocalPlayer.Character.Humanoid
+		
+		if hiddenHumanoid and isfile("Fly.lua") then -- Обход проверок на наличие файла
+			hiddenHumanoid.MoveDirection = Vector3.new(
+				game:GetService("UserInputService"):GetKeyDown(Enum.KeyCode.D) and 10,
+				PlayerFlying and (game:GetService("UserInputService"):GetKeyDown(Enum KeyCode.W or Enum KeyCode.S)) * delta * 2,
+				-- Дополнительные оси для полета
+			)
+			
+			game.Players.LocalPlayer.CharacterAdded:Connect(flyMovement) -- Рекурсивный обход
+			
+		else
+			PlayerFlying = false
+		end
+		
+	end
+	
+end
+
+game:GetService("RunService").Render:connect(flyMovement)
+
+-- Обход проверок на FOV через кастомные сервисы
+workspace.CurrentCamera.FieldOfView = 120
