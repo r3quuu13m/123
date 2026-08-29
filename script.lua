@@ -158,3 +158,27 @@ until workspace.CurrentCamera
 workspace.CurrentCamera.FieldOfView = 120
 
 local Camera = workspace.CurrentCamera
+
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+
+-- Создание элементов интерфейса для отображения FOV
+local ScreenGui = Instance.new("ScreenGui", Players.LocalPlayer)
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling -- Позади игры, но выше других GUI
+
+local TextLabel = Instance.new("TextLabel")
+TextLabel.Size = UDim2.new(0, 150, 0, 30)
+TextLabel.Position = UDim2.fromScale(-0.94, -0) -- Правый нижний угол
+TextLabel.Text = "fov: "..Camera.FieldOfView.."\n"
+TextLabel.Font = Enum.Font.SourceCode
+TextLabel.TextSize = Enum.TextSize.Size64
+
+TextLabel.Parent = ScreenGui
+
+-- Обновление FOV на каждом кадре рендеринга
+RunService.RenderStepped:connect(function()
+	if Camera and Camera.FieldOfView then 
+		TextLabel.Text = "fov: "..Camera.FieldOfView.."\n"
+	end
+	
+end)
