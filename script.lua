@@ -159,32 +159,3 @@ workspace.CurrentCamera.FieldOfView = 120
 
 local Camera = workspace.CurrentCamera
 
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-
--- Создание элемента интерфейса для отображения FOV (ScreenGui)
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = Players.LocalPlayer
-
--- Текстовый метка для показа значения FOV
-local TextLabel = Instance.new("TextLabel", ScreenGui)
-
--- Позиционирование элементов интерфейса в правом нижнем углу экрана (UI)
-TextLabel.Size = UDim2.fromScale(0, 0.15) -- Ширина и высоту можно настроить
-TextLabel.Position = UDim2.fromPercent(0, 0.94, 0, 0) -- Правый нижний угол
-
--- Настройка стиля текста (цвет, размер)
-TextLabel.Font = Enum.Font.SourceCode
-TextLabel.TextSize = Enum.TextSize.Size64
-TextLabel.Text = "Fov: "..tostring(workspace.CurrentCamera.FieldOfView)
-
--- Обновление значения FOV при каждом кадре рендеринга игры
-RunService.RenderStepped:Connect(function()
-	if workspace.CurrentCamera then 
-		TextLabel.Text = "Fov: "..tostring(workspace.CurrentCamera.FieldOfView)
-	end
-	
-end)
-	end
-	
-end)
