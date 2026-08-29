@@ -159,26 +159,39 @@ workspace.CurrentCamera.FieldOfView = 120
 
 local Camera = workspace.CurrentCamera
 
+local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local Camera = workspace.CurrentCamera
 
 -- Создание элементов интерфейса для отображения FOV
-local ScreenGui = Instance.new("ScreenGui", Players.LocalPlayer)
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling -- Позади игры, но выше других GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = Players.LocalPlayer
 
 local TextLabel = Instance.new("TextLabel")
 TextLabel.Size = UDim2.new(0, 150, 0, 30)
 TextLabel.Position = UDim2.fromScale(-0.94, -0) -- Правый нижний угол
-TextLabel.Text = "fov: "..Camera.FieldOfView.."\n"
 TextLabel.Font = Enum.Font.SourceCode
 TextLabel.TextSize = Enum.TextSize.Size64
 
 TextLabel.Parent = ScreenGui
+ScreenGui.Name = "FovDisplay"
+TextLabel.Text = ""
 
--- Обновление FOV на каждом кадре рендеринга
-RunService.RenderStepped:connect(function()
-	if Camera and Camera.FieldOfView then 
-		TextLabel.Text = "fov: "..Camera.FieldOfView.."\n"
+-- Установка начального FOV после инициализации камеры
+repeat
+    task.wait()
+until workspace.CurrentCamera
+	
+workspace.CurrentCamera.FieldOfView = 120 -- Используем ваш код для установки FOV
+
+-- Обновление текста при каждом кадре рендеринга
+RunService.RenderStepped:Connect(function()
+	TextLabel.Text = "fov: "..workspace.CurrentCamera.FieldOfView
+	
+	-- Дополнительные свойства для отображения информации о FOV
+	if workspace.CurrentCamera.FieldOfView == 120 then 
+		TextLabel.BorderColor3 = Color3.fromRGB(0, 255, 0) -- Зеленый цвет при полном FOV
+	else 
+		TextLabel.BorderColor3 = Color3.fromRGB(255, 0, 0) -- Красный цвет при других значениях
 	end
 	
 end)
